@@ -13,10 +13,78 @@ impl Lexer {
         }
     }
 
+    fn make_num(&mut self) -> Token {
+        let mut value: String = String::new();
+        let start_pos: usize = self.pos;
+        let mut num_of_dots: i8 = 0;
+
+        while (self.char.is_numeric() || (self.char == '.' && num_of_dots <= 1)) && self.pos < self.text.len()-1 {
+            if self.char == '.' {
+                num_of_dots += 1;
+            }
+            value.push(self.char);
+            self.advance();
+        }
+
+        if num_of_dots > 0 {
+            return Token { value: value, t_type: TType::FLOAT, position: start_pos};
+        } else {
+            return Token { value: value, t_type: TType::INT, position: start_pos};
+        }
+    }
+
+    fn make_str(&mut self) -> Token {
+        let mut value: String = String::from(self.char);
+        let start_pos: usize = self.pos;
+        let mut run: bool = true;
+        self.advance();
+
+        while run {
+            if self.char != '"' && self.pos < self.text.len()-1 {
+                value.push(self.char);
+                self.advance();
+            } else if self.pos == self.text.len()-1 {
+                println!("STRING NOT FINISHED");
+                run = false;
+            } else {
+                run = false;
+            }
+        }    
+        value.push(self.char);
+        self.advance();
+
+        return Token { value: value, t_type: TType::STRING, position: start_pos };
+    }
+
+
+    fn make_identifier(&mut self) -> Token {
+        let mut value: String = String::new();
+        let start_pos: usize = self.pos;
+
+        while self.char.is_alphanumeric() && self.pos < self.text.len()-1 {
+            value.push(self.char);
+            self.advance();
+        }
+
+        return Token { value: value, t_type: TType::IDENT, position: start_pos};
+    }
+
     pub fn tokenize(mut self) -> Vec<Token>{
         while self.pos < self.text.len()-1 {
-            if self.char == ' ' {
+            if self.char.is_whitespace() {
                 self.advance();
+                continue;
+            } else if self.char.is_numeric() {
+                let token: Token = self.make_num();
+                self.tokens.push(token);
+                continue;
+            } else if self.char.is_alphabetic() {
+                let token: Token = self.make_identifier();
+                self.tokens.push(token);
+                continue;
+            } else if self.char == '"' {
+                let token: Token = self.make_str();
+                self.tokens.push(token);
                 continue;
             }
 
@@ -62,6 +130,15 @@ enum TType {
     DIV,
     STRING,
     INT,
+    FLOAT,
+    IDENT,
+    ASSIGN,
+    EQUAL,
+    NOT_EQUAL,
+    LESS,
+    LESS_EQUAL,
+    GRATER,
+    GRATER_EQUAL,
     PARENLEFT,
     PARENRIGHT,
     CURLYLEFT,
@@ -78,6 +155,15 @@ impl std::fmt::Display for TType {
             TType::DIV => write!(f, "DIV"),
             TType::STRING => write!(f, "STRING"),
             TType::INT => write!(f, "INT"),
+            TType::FLOAT => write!(f, "FLOAT"),
+            TType::IDENT => write!(f, "IDENTIFIER"),
+            TType::ASSIGN => write!(f, "ASSIGNMENT"),
+            TType::EQUAL=> write!(f, "EQUAL"),
+            TType::NOT_EQUAL=> write!(f, "NOT EQUAL"),
+            TType::LESS => write!(f, "LESS"),
+            TType::LESS_EQUAL => write!(f, "LESS EQUAL"),
+            TType::GRATER => write!(f, "GRATER"),
+            TType::GRATER_EQUAL => write!(f, "GRATER EQUAL"),
             TType::PARENLEFT => write!(f, "PARENLEFT"),
             TType::PARENRIGHT => write!(f, "PARENRIGHT"),
             TType::CURLYLEFT => write!(f, "CURLYLEFT"),
