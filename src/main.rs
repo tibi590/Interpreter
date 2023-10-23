@@ -1,12 +1,51 @@
-pub mod lexer;
+use std::{self, io::{self, Write}};
+use std::env;
+use std::fs;
 
-use std::{io::{self, Write}, vec};
+mod interpreter;
+use interpreter::lexer;
+use interpreter::error;
+use interpreter::token;
 
 fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    if args.len() > 1 {
+        file(args[1].clone());
+    } else {
+        inline()
+    }
+}
+
+fn file(file_path: String) {
+    let contents = fs::read_to_string(file_path.clone()).expect("Succesfull Read From File");
+
+    let lexer = lexer::Lexer{ 
+        file_location: file_path,
+        text: contents.clone(), 
+        char: contents.clone().chars().nth(0).unwrap(),
+        ..Default::default()
+    };
+
+    let tokens: Vec<token::Token>;
+    let errors: Vec<error::Error>;
+
+    (errors, tokens) = lexer.tokenize();
+    
+    for token in tokens.into_iter() {
+        println!("{}", token);
+    }
+
+    for error in errors.into_iter() {
+        println!("{}", error);
+    }
+}
+
+fn inline() {
     loop {
         let mut input: String = String::new();
 
-        print!("-> ");
+        print!("\n-> ");
         io::stdout()
             .flush()
             .unwrap();
@@ -15,12 +54,23 @@ fn main() {
             .read_line(&mut input)
             .unwrap();
 
-        let lexer = lexer::Lexer{ text: input.clone(), pos: 0, char: input.clone().chars().nth(0).unwrap(), tokens: vec![] };
+        let lexer = lexer::Lexer{ 
+            text: input.clone(), 
+            char: input.clone().chars().nth(0).unwrap(),
+            ..Default::default()
+        };
 
-        let tokens: Vec<lexer::Token> = lexer.tokenize();
+        let tokens: Vec<token::Token>;
+        let errors: Vec<error::Error>;
 
+        (errors, tokens) = lexer.tokenize();
+        
         for token in tokens.into_iter() {
             println!("{}", token);
+        }
+
+        for error in errors.into_iter() {
+            println!("{}", error);
         }
     }
 }
