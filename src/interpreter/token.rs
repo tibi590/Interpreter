@@ -28,6 +28,8 @@ pub enum TType {
     Ident,
 
     Print,
+    If,
+    Else,
 
     Bang,
     Assign,
@@ -62,6 +64,8 @@ impl std::fmt::Display for TType {
             TType::Ident => write!(f, "Identifier"),
 
             TType::Print => write!(f, "Print"),
+            TType::If => write!(f, "If"),
+            TType::Else => write!(f, "Else"),
 
             TType::Assign => write!(f, "Assignment"),
             TType::Equal => write!(f, "Equal"),

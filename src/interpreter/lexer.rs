@@ -4,6 +4,7 @@ use crate::interpreter::token::{Token, TType};
 pub struct Lexer{
     pub file_location: String,
     pub text: String,
+    pub line_text: Vec<String>,
     pub pos: usize,
     pub line: usize,
     pub line_pos: usize,
@@ -18,8 +19,9 @@ impl Default for Lexer {
         Lexer { 
             file_location: "<stdin>".to_string(),
             text: "".to_string(),
+            line_text: vec![],
             pos: 0,
-            line: 1,
+            line: 0,
             line_pos: 0,
             char: ' ',
             tokens: vec![],
@@ -31,8 +33,11 @@ impl Default for Lexer {
 
 impl Lexer {
     fn advance(&mut self) {
+        if self.char != '\n' {
+            self.line_pos += 1;
+        } 
+
         self.pos += 1;
-        self.line_pos += 1;
         if self.is_at_end() {
             self.char = self.text.chars().nth(self.pos).unwrap();
         }
@@ -81,30 +86,33 @@ impl Lexer {
         let mut value: String = String::from(self.char);
         let start_pos: usize = self.line_pos;
         let start_line: usize = self.line;
+        let mut next_ch: char = self.get_next();
         let mut run: bool = true;
-        self.advance();
-
+        
         while run {
-            if self.char != '"' && self.is_at_end() {
-                value.push(self.char);
+            if next_ch.is_alphanumeric() && self.is_at_end() {
                 self.advance();
-            } else if self.pos == self.text.len()-1 {
-                run = false;
+                value.push(self.char);
 
+                next_ch = self.get_next();
+            } else if next_ch == '"' {
+                self.advance();
+                value.push(self.char);
+
+                run = false
+            } else if !self.is_at_end() {
                 self.errors.push(error::Error { 
                     file_location: self.file_location.clone(),
-                    value: value.clone(),
+                    value: self.line_text[self.line].clone(),
                     pos: start_pos,
                     line: start_line,
                     e_type: error::ErrorType::StringError
                 });
+
                 self.has_error = true;
-            } else {
                 run = false;
             }
-        }    
-        value.push(self.char);
-        self.advance();
+        }
 
         return Token { value: value, t_type: TType::String, position: start_pos, line: start_line};
     }
@@ -125,9 +133,11 @@ impl Lexer {
         }
 
         match value.as_str() {
-            "true" => token = Token { value: "true".to_string(), t_type: TType::Bool, position: start_pos, line: start_line },
-            "false" => token = Token { value: "false".to_string(), t_type: TType::Bool, position: start_pos, line: start_line },
-            "print" => token = Token { value: "print".to_string(), t_type: TType::Print, position: start_pos, line: start_line },
+            "true" => token = Token { value: value, t_type: TType::Bool, position: start_pos, line: start_line },
+            "false" => token = Token { value: value, t_type: TType::Bool, position: start_pos, line: start_line },
+            "print" => token = Token { value: value, t_type: TType::Print, position: start_pos, line: start_line },
+            "if" => token = Token { value: value, t_type: TType::If, position: start_pos, line: start_line },
+            "else" => token = Token { value: value, t_type: TType::Else, position: start_pos, line: start_line },
             _ => token = Token { value: value, t_type: TType::Ident, position: start_pos, line: start_line },
         }
 
@@ -187,7 +197,7 @@ impl Lexer {
                 _ => {
                     self.errors.push(error::Error { 
                         file_location: self.file_location.clone(),
-                        value: self.char.to_string(),
+                        value: self.line_text[self.line].clone(),
                         pos: self.line_pos,
                         line: self.line,
                         e_type: error::ErrorType::SyntaxError

@@ -19,10 +19,16 @@ fn main() {
 
 fn file(file_path: String) {
     let contents = fs::read_to_string(file_path.clone()).expect("Succesfull Read From File");
+    let mut lines: Vec<String> = vec![];
+
+    for line in contents.split('\n') {
+        lines.push(line.to_owned());
+    }
 
     let lexer = lexer::Lexer{ 
         file_location: file_path,
         text: contents.clone(), 
+        line_text: lines,
         char: contents.clone().chars().nth(0).unwrap(),
         ..Default::default()
     };
@@ -32,9 +38,11 @@ fn file(file_path: String) {
 
     (errors, tokens) = lexer.tokenize();
     
+    /*
     for token in tokens.into_iter() {
         println!("{}", token);
     }
+    */
 
     for error in errors.into_iter() {
         println!("{}", error);
@@ -56,6 +64,7 @@ fn inline() {
 
         let lexer = lexer::Lexer{ 
             text: input.clone(), 
+            line_text: vec![input.clone()],
             char: input.clone().chars().nth(0).unwrap(),
             ..Default::default()
         };
@@ -65,10 +74,11 @@ fn inline() {
 
         (errors, tokens) = lexer.tokenize();
         
+        /*
         for token in tokens.into_iter() {
             println!("{}", token);
         }
-
+        */
         for error in errors.into_iter() {
             println!("{}", error);
         }

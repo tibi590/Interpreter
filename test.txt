@@ -1,3 +1,8 @@
-kaka = true
+kak:a = 7
+kak:a = 7
 
-print(kaka)
+if (kaka==7) {
+    print(kaka)?
+} else {
+    print("kaka")
+}
