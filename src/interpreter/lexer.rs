@@ -54,7 +54,7 @@ impl Lexer {
     }
 
     fn is_at_end(&mut self) -> bool {
-        return self.pos < self.text.len();
+        return self.pos < self.text.len()-1;
     }
 
     fn make_num(&mut self) -> Token {
@@ -145,10 +145,8 @@ impl Lexer {
     }
 
     pub fn tokenize(mut self) -> (Vec<error::Error>, Vec<Token>) {
-        println!("{}", self.text);
         while self.is_at_end() {
             let ch: char = self.char;
-            println!("'{}'", ch);
             
             match ch {
                 ' ' | '\t' | '\r' => {},
@@ -197,7 +195,6 @@ impl Lexer {
                 '<' => self.tokens.push(Token { value: ch.to_string(), t_type: TType::Less, position: self.line_pos, line: self.line }),
                 '>' => self.tokens.push(Token { value: ch.to_string(), t_type: TType::Grater, position: self.line_pos, line: self.line }),
                 _ => {
-                    println!("x{}x", ch);
                     self.errors.push(error::Error { 
                         file_location: self.file_location.clone(),
                         value: self.line_text[self.line].clone(),

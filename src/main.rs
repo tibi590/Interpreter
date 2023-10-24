@@ -65,7 +65,7 @@ fn inline() {
             .unwrap();
 
         let lexer = lexer::Lexer{ 
-            text: input.trim().to_string().clone(), 
+            text: input.clone(), 
             line_text: vec![input.clone().trim().to_string()],
             char: input.clone().chars().nth(0).unwrap(),
             ..Default::default()
