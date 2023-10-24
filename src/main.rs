@@ -22,7 +22,7 @@ fn file(file_path: String) {
     let mut lines: Vec<String> = vec![];
 
     for line in contents.split('\n') {
-        lines.push(line.trim_end().to_owned());
+        lines.push(line.trim_end().to_string());
     }
 
     let lexer = lexer::Lexer{ 
@@ -65,8 +65,8 @@ fn inline() {
             .unwrap();
 
         let lexer = lexer::Lexer{ 
-            text: input.clone(), 
-            line_text: vec![input.clone().trim_end().to_string()],
+            text: input.trim().to_string().clone(), 
+            line_text: vec![input.clone().trim().to_string()],
             char: input.clone().chars().nth(0).unwrap(),
             ..Default::default()
         };
