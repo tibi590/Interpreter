@@ -38,15 +38,17 @@ fn file(file_path: String) {
 
     (errors, tokens) = lexer.tokenize();
     
-    /*
+    println!("##### TOKENS START #####");
     for token in tokens.into_iter() {
         println!("{}", token);
     }
-    */
+    println!("##### TOKENS END #####");
 
+    println!("##### ERRORS START #####");
     for error in errors.into_iter() {
         println!("{}", error);
     }
+    println!("##### ERRORS END #####");
 }
 
 fn inline() {
@@ -74,13 +76,16 @@ fn inline() {
 
         (errors, tokens) = lexer.tokenize();
         
-        /*
+        println!("##### TOKENS START #####");
         for token in tokens.into_iter() {
             println!("{}", token);
         }
-        */
+        println!("##### TOKENS END #####");
+
+        println!("##### ERRORS START #####");
         for error in errors.into_iter() {
             println!("{}", error);
         }
+        println!("##### ERRORS END #####");
     }
 }
