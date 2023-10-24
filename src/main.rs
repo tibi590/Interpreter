@@ -43,7 +43,7 @@ fn file(file_path: String) {
         println!("{}", token);
     }
     println!("##### TOKENS END #####");
-
+    println!("---------------------------------");
     println!("##### ERRORS START #####");
     for error in errors.into_iter() {
         println!("{}", error);
@@ -81,7 +81,7 @@ fn inline() {
             println!("{}", token);
         }
         println!("##### TOKENS END #####");
-
+        println!("---------------------------------");
         println!("##### ERRORS START #####");
         for error in errors.into_iter() {
             println!("{}", error);

@@ -10,7 +10,7 @@ impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let offset: String = " ".repeat(self.pos);
         let text: String = String::from(self.value.trim_end_matches('\n'));
-        write!(f, "\nError type: {}; Location: {} at {}:{}\n|{}\n|{}^", self.e_type, self.file_location, self.line, self.pos, text, offset)
+        write!(f, "Error type: {}; Location: {} at {}:{}\n|{}\n|{}^", self.e_type, self.file_location, self.line, self.pos, text, offset)
     }
 }
 
