@@ -4,7 +4,6 @@ use std::fs;
 
 mod interpreter;
 use interpreter::lexer;
-use interpreter::error;
 use interpreter::token;
 
 fn main() {
@@ -18,37 +17,27 @@ fn main() {
 }
 
 fn file(file_path: String) {
-    let contents = fs::read_to_string(file_path.clone()).expect("Succesfull Read From File");
-    let mut lines: Vec<String> = vec![];
+    let contents: Vec<char> = fs::read_to_string(file_path.clone()).expect("Succesfull Read From File").chars().collect();
 
-    for line in contents.split('\n') {
-        lines.push(line.trim_end().to_string());
-    }
-
-    let lexer = lexer::Lexer{ 
-        file_location: file_path,
+    let mut lexer = lexer::Lexer{ 
         text: contents.clone(), 
-        line_text: lines,
-        char: contents.clone().chars().nth(0).unwrap(),
-        ..Default::default()
+        len: contents.len(),
+        tokens: vec![],
+        pos: 0,
+        ch: contents[0],
+        line: 0,
+        linepos: 0,
     };
 
     let tokens: Vec<token::Token>;
-    let errors: Vec<error::Error>;
 
-    (errors, tokens) = lexer.tokenize();
+    tokens = lexer.tokenize();
     
     println!("##### TOKENS START #####");
     for token in tokens.into_iter() {
         println!("{}", token);
     }
     println!("##### TOKENS END #####");
-    println!("---------------------------------");
-    println!("##### ERRORS START #####");
-    for error in errors.into_iter() {
-        println!("{}", error);
-    }
-    println!("##### ERRORS END #####");
 }
 
 fn inline() {
@@ -64,28 +53,26 @@ fn inline() {
             .read_line(&mut input)
             .unwrap();
 
-        let lexer = lexer::Lexer{ 
-            text: input.clone(), 
-            line_text: vec![input.clone().trim().to_string()],
-            char: input.clone().chars().nth(0).unwrap(),
-            ..Default::default()
+        let contents: Vec<char> = input.chars().collect();
+
+        let mut lexer = lexer::Lexer{ 
+            text: contents.clone(), 
+            len: contents.len(),
+            tokens: vec![],
+            pos: 0,
+            ch: contents[0],
+            line: 0,
+            linepos: 0,
         };
 
         let tokens: Vec<token::Token>;
-        let errors: Vec<error::Error>;
 
-        (errors, tokens) = lexer.tokenize();
+        tokens = lexer.tokenize();
         
         println!("##### TOKENS START #####");
         for token in tokens.into_iter() {
             println!("{}", token);
         }
         println!("##### TOKENS END #####");
-        println!("---------------------------------");
-        println!("##### ERRORS START #####");
-        for error in errors.into_iter() {
-            println!("{}", error);
-        }
-        println!("##### ERRORS END #####");
     }
 }

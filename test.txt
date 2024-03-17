@@ -1,8 +1,4 @@
-kak:a = 7
-kak:a = 7
+3*3
+69+420
 
-if (kaka==7) {
-    print(kaka)?
-} else {
-    print("kaka")
-}
+555/5
