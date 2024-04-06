@@ -57,10 +57,49 @@ impl Lexer {
                     self.line += 1; 
                     self.linepos = 0;
                 },
-                '+' => { self.tokens.push(Token { value: String::from('+'), t_type: TType::Plus, position: self.linepos, line: self.line }); },
-                '-' => { self.tokens.push(Token { value: String::from('-'), t_type: TType::Minus, position: self.linepos, line: self.line }); },
-                '*' => { self.tokens.push(Token { value: String::from('*'), t_type: TType::Multi, position: self.linepos, line: self.line }); },
-                '/' => { self.tokens.push(Token { value: String::from('/'), t_type: TType::Div, position: self.linepos, line: self.line }); },
+
+                '(' => { self.tokens.push(Token { 
+                    value: String::from('('), 
+                    t_type: TType::ParenLeft, 
+                    position: self.linepos, 
+                    line: self.line }); 
+                },
+
+                ')' => { self.tokens.push(Token { 
+                    value: String::from(')'), 
+                    t_type: TType::ParenRight, 
+                    position: self.linepos, 
+                    line: self.line }); 
+                },
+            
+                '+' => { self.tokens.push(Token { 
+                    value: String::from('+'), 
+                    t_type: TType::Plus, 
+                    position: self.linepos, 
+                    line: self.line }); 
+                },
+                
+                '-' => { self.tokens.push(Token { 
+                    value: String::from('-'),
+                    t_type: TType::Minus,
+                    position: self.linepos,
+                    line: self.line }); 
+                },
+
+                '*' => { self.tokens.push(Token { 
+                    value: String::from('*'),
+                    t_type: TType::Multi,
+                    position: self.linepos,
+                    line: self.line });
+                },
+
+                '/' => { self.tokens.push(Token { 
+                    value: String::from('/'),
+                    t_type: TType::Div,
+                    position: self.linepos,
+                    line: self.line });
+                },
+
                 '0' ..= '9' => { 
                     let token: Token = self.make_num();
                     self.tokens.push(token); 
@@ -70,6 +109,13 @@ impl Lexer {
 
             self.advance();
         }
+
+        self.tokens.push(Token { 
+            value: String::from("<EOF>"), 
+            t_type: TType::EOF,
+            position: self.linepos,
+            line: self.line 
+        });
 
         return self.tokens;
     }
