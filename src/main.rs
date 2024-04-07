@@ -17,7 +17,10 @@ fn main() {
 }
 
 fn file(file_path: String) {
-    let contents: Vec<char> = fs::read_to_string(file_path.clone()).expect("Succesfull Read From File").chars().collect();
+    let contents: Vec<char> = fs::read_to_string(file_path.clone())
+        .expect("Succesfull Read From File")
+        .chars()
+        .collect();
 
     let mut lexer = lexer::Lexer{ 
         text: contents.clone(), 
