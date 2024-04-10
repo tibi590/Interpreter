@@ -12,7 +12,7 @@ impl std::fmt::Display for Token {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TType {
     Plus,
     Minus,
@@ -26,6 +26,23 @@ pub enum TType {
 
     ParenLeft,
     ParenRight,
+
+    Bang,
+    Equal,
+
+    Less,
+    Greater,
+
+    LessEqual,
+    GreaterEqual,
+
+    BangEqual,
+    EqualEqual,
+
+    True,
+    False,
+
+    Nil,
 
     EOF,
 }
@@ -45,7 +62,24 @@ impl std::fmt::Display for TType {
 
             TType::ParenLeft => write!(f, "ParenLeft"),
             TType::ParenRight => write!(f, "ParenRight"),
+
+            TType::Bang => write!(f, "Bang"),
+            TType::Equal => write!(f, "Equal"),
+
+            TType::Less => write!(f, "Less"),
+            TType::Greater => write!(f, "Greater"),
+
+            TType::LessEqual => write!(f, "LessEqual"),
+            TType::GreaterEqual => write!(f, "GreaterEqual"),
+
+            TType::BangEqual => write!(f, "BangEqual"),
+            TType::EqualEqual => write!(f, "EqualEqual"),
             
+            TType::True => write!(f, "True"),
+            TType::False => write!(f, "False"),
+
+            TType::Nil => write!(f, "Nil"),
+
             TType::EOF => write!(f, "<EOF>")
         }
     }

@@ -1,10 +1,13 @@
-use std::{self, io::{self, Write}};
+use std::{self, fmt::Pointer, io::{self, Write}};
 use std::env;
 use std::fs;
 
 mod interpreter;
 use interpreter::lexer;
 use interpreter::token;
+use interpreter::node;
+
+use crate::interpreter::parser::Parser;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -17,12 +20,10 @@ fn main() {
 }
 
 fn file(file_path: String) {
-    let contents: Vec<char> = fs::read_to_string(file_path.clone())
-        .expect("Succesfull Read From File")
-        .chars()
-        .collect();
+    let contents: Vec<u8> = fs::read(file_path.clone())
+        .expect("Error reading from file");
 
-    let mut lexer = lexer::Lexer{ 
+    let lexer = lexer::Lexer{ 
         text: contents.clone(), 
         len: contents.len(),
         tokens: vec![],
@@ -32,12 +33,10 @@ fn file(file_path: String) {
         linepos: 0,
     };
 
-    let tokens: Vec<token::Token>;
-
-    tokens = lexer.tokenize();
+    let tokens: Vec<token::Token> = lexer.tokenize();
     
     println!("##### TOKENS START #####");
-    for token in tokens.into_iter() {
+    for token in tokens.clone().into_iter() {
         println!("{}", token);
     }
     println!("##### TOKENS END #####");
@@ -56,9 +55,9 @@ fn inline() {
             .read_line(&mut input)
             .unwrap();
 
-        let contents: Vec<char> = input.chars().collect();
+        let contents: Vec<u8> = input.as_bytes().to_vec();
 
-        let mut lexer = lexer::Lexer{ 
+        let lexer = lexer::Lexer{ 
             text: contents.clone(), 
             len: contents.len(),
             tokens: vec![],
@@ -68,14 +67,21 @@ fn inline() {
             linepos: 0,
         };
 
-        let tokens: Vec<token::Token>;
-
-        tokens = lexer.tokenize();
+        let tokens: Vec<token::Token> = lexer.tokenize();
         
         println!("##### TOKENS START #####");
-        for token in tokens.into_iter() {
+        for token in tokens.clone().into_iter() {
             println!("{}", token);
         }
         println!("##### TOKENS END #####");
+
+        let mut parser: Parser = Parser {
+            tokens: tokens,
+            pos: 0
+        };
+
+        println!("\n##### AST START #####");
+        let ast = parser.parse();
+        println!("##### AST END #####");
     }
 }
