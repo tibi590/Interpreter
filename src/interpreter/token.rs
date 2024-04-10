@@ -44,6 +44,8 @@ pub enum TType {
 
     Nil,
 
+    If,
+
     EOF,
 }
 
@@ -79,6 +81,8 @@ impl std::fmt::Display for TType {
             TType::False => write!(f, "False"),
 
             TType::Nil => write!(f, "Nil"),
+
+            TType::If => write!(f, "If"),
 
             TType::EOF => write!(f, "<EOF>")
         }

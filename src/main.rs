@@ -1,4 +1,4 @@
-use std::{self, fmt::Pointer, io::{self, Write}};
+use std::{self, io::{self, Write}};
 use std::env;
 use std::fs;
 
@@ -82,6 +82,37 @@ fn inline() {
 
         println!("\n##### AST START #####");
         let ast = parser.parse();
+
+        println!("{}", tree_walker(ast));
+
         println!("##### AST END #####");
+    }
+}
+
+fn tree_walker(node: node::Expr) -> String {
+    match node {
+        node::Expr::Equality { left, op, right } => {
+            return format!("({} {} {})", tree_walker(*left), op.value, tree_walker(*right));
+        },
+
+        node::Expr::Comparision { left, op, right } => {
+            return format!("({} {} {})", tree_walker(*left), op.value, tree_walker(*right));
+        },
+
+        node::Expr::Term { left, op, right } => {
+            return format!("({} {} {})", tree_walker(*left), op.value, tree_walker(*right));
+        },
+        
+        node::Expr::Factor { left, op, right } => {
+            return format!("({} {} {})", tree_walker(*left), op.value, tree_walker(*right));
+        },
+
+        node::Expr::Unary { op, right } => {
+            return format!("({} {})", op.value, tree_walker(*right));
+        },
+
+        node::Expr::Literal(value) => {
+            return format!("({value})");
+        }
     }
 }

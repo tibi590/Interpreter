@@ -2,6 +2,7 @@ use std::fmt;
 
 use crate::interpreter::token::*;
 
+#[derive(Debug)]
 pub enum Expr {
     Equality {
         left: Box<Expr>,
@@ -55,6 +56,7 @@ impl std::fmt::Display for Expr {
     }
 }
 
+#[derive(Debug)]
 pub enum Literals {
     Int(f64),
     String(String),

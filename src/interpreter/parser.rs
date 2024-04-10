@@ -20,6 +20,19 @@ impl Parser {
     fn current(&self) -> Token {
         return self.tokens[self.pos].clone();
     }
+
+    fn next(&self) -> Token {
+        if self.is_at_end() {
+            return self.tokens[self.pos+1].clone();
+        }
+
+        return Token {
+            value: "<EOF>".to_string(),
+            t_type: TType::EOF,
+            position: 0,
+            line: 0
+        };
+    }
     
     fn previous(&self) -> Token {
         return self.tokens[self.pos-1].clone();
@@ -38,8 +51,9 @@ impl Parser {
     fn equality(&mut self) -> Expr {
         let mut expr: Expr = self.comparison();
 
-        while match self.current().t_type {
+        while match self.next().t_type {
             TType::BangEqual | TType::EqualEqual => {
+                self.advance();
                 self.advance();
                 true
             },
@@ -62,11 +76,12 @@ impl Parser {
     fn comparison(&mut self) -> Expr {
         let mut expr: Expr = self.term();
 
-        while match self.current().t_type {
+        while match self.next().t_type {
             TType::Less | 
             TType::LessEqual |
             TType::Greater |
             TType::GreaterEqual => {
+                self.advance();
                 self.advance();
                 true
             },
@@ -89,9 +104,10 @@ impl Parser {
     fn term(&mut self) -> Expr {
         let mut expr: Expr = self.factor();
 
-        while match self.current().t_type {
+        while match self.next().t_type {
             TType::Plus |
             TType::Minus => {
+                self.advance();
                 self.advance();
                 true
             },
@@ -114,9 +130,10 @@ impl Parser {
     fn factor(&mut self) -> Expr {
         let mut expr: Expr = self.unary();
 
-        while match self.current().t_type {
-            TType::Plus |
-            TType::Minus => {
+        while match self.next().t_type {
+            TType::Multi |
+            TType::Div => {
+                self.advance();
                 self.advance();
                 true
             },
@@ -153,6 +170,7 @@ impl Parser {
                 op: op,
                 right: Box::new(right)
             };
+            self.advance();
 
             return expr;
         }
@@ -160,7 +178,7 @@ impl Parser {
         return self.primary();
     }
 
-    fn primary(&self) -> Expr {
+    fn primary(&mut self) -> Expr {
         let current: Token = self.current();
 
         match current.t_type {
@@ -168,7 +186,7 @@ impl Parser {
                 Box::new(Literals::Int(current.value.parse::<f64>().unwrap()))
             ),
             TType::Ident => return Expr::Literal(
-                Box::new(Literals::String(current.to_string()))
+                Box::new(Literals::String(current.value))
             ),
             TType::True => return Expr::Literal(
                 Box::new(Literals::True)
@@ -179,6 +197,19 @@ impl Parser {
             TType::Nil => return Expr::Literal(
                 Box::new(Literals::Nil)
             ),
+            TType::ParenLeft => {
+                self.advance();
+                let expr: Expr = self.expression();
+
+                println!("{}", self.next().t_type);
+                if self.next().t_type == TType::ParenRight {
+                    return expr;
+                }
+
+                return Expr::Literal(
+                    Box::new(Literals::Nil)
+                );
+            },
             _ => return Expr::Literal(
                 Box::new(Literals::Nil)
             )

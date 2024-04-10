@@ -86,6 +86,15 @@ impl Lexer {
                 }
             },
 
+            "if" => {
+                return Token {
+                    value: String::from(value),
+                    t_type: TType::If,
+                    position: self.linepos,
+                    line: self.line
+                }
+            },
+
             _ => {
                 return Token {
                     value: String::from(value),
